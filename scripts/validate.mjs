@@ -32,4 +32,5 @@ for (const objectName of ["Texte6", "Texte10", "Code à barres1", "Code à barre
   assert.ok(templateXml.includes(`objectName="${objectName}"`), `P-touch template is missing ${objectName}`);
 }
 assert.match(templateXml, /protocol="CODE128"/);
+assert.match(templateXml, /objectName="Texte6"[\s\S]*?<text:textControl control="FREE" clipFrame="true" aspectNormal="true" shrink="false" autoLF="true"/);
 console.log(`Validated Amazon Brother Package Label ${manifest.version}.`);

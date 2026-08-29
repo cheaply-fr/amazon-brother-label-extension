@@ -36,5 +36,7 @@ test("Shopify printing enforces replacement-model selection and production quali
 test("printer check renders without printing and print mode sends exactly one copy", () => {
   assert.match(source, /value\.job\.mode === "check"/);
   assert.match(source, /instance\.getImageData\(data\)/);
+  assert.match(source, /data:image\/png;base64/);
+  assert.match(source, /brother-label-preview/);
   assert.match(source, /copies: 1/);
 });

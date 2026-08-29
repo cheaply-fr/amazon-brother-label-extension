@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Amazon Brother Package Label BETA",
-  "version": "2.0.19",
+  "version": "2.0.20",
   "description": "THIS EXTENSION IS FOR BETA TESTING. Prints 62 mm Amazon Seller Central package labels through Brother b-PAC.",
   "permissions": ["storage"],
   "host_permissions": [

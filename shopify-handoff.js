@@ -10,6 +10,16 @@
     statusNode.classList.toggle("error", error);
   }
 
+  function showPreview(base64Png) {
+    document.getElementById("brother-label-preview")?.remove();
+    const image = document.createElement("img");
+    image.id = "brother-label-preview";
+    image.alt = "Rendered Brother package label preview";
+    image.src = `data:image/png;base64,${base64Png}`;
+    image.style.cssText = "display:block;max-width:100%;max-height:70vh;margin:16px auto 0;border:1px solid #d8d8d8;background:#fff;object-fit:contain";
+    statusNode?.insertAdjacentElement("afterend", image);
+  }
+
   function waitForBrotherBridge(timeout = 8000) {
     if (document.body?.classList.contains("bpac-extension-installed")) return Promise.resolve();
     return new Promise((resolve, reject) => {
@@ -86,6 +96,7 @@
     if (value.job.mode === "check") {
       const image = await instance.getImageData(data);
       if (!image || image.length < 100) throw new Error("Brother could not render the package-label template.");
+      showPreview(image);
       status(`Brother setup is ready (${printerStatus.printerName || settings.printerName}, 62 mm continuous). No label was printed.`);
     } else {
       await instance.print(data, { copies: 1, printName: `Shopify ${value.job.orderId}`, fitPage: false, autoCut: true, quality: true, highResolution: true, highSpeed: false });
