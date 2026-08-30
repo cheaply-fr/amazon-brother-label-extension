@@ -1,11 +1,12 @@
 {
   "manifest_version": 3,
   "name": "Amazon Brother Package Label BETA",
-  "version": "2.0.20",
+  "version": "2.0.21",
   "description": "THIS EXTENSION IS FOR BETA TESTING. Prints 62 mm Amazon Seller Central package labels through Brother b-PAC.",
   "permissions": ["storage"],
   "host_permissions": [
     "https://sellercentral.amazon.fr/orders-v3/order/*",
+    "https://chlabs-brother-label-api-ajz3qng24a-od.a.run.app/shopify/brother-print*",
     "https://amazon-chronopost-direct-api-ajz3qng24a-od.a.run.app/shopify/brother-print*"
   ],
   "background": {
@@ -20,6 +21,7 @@
       "resources": ["bpac-sdk.js"],
       "matches": [
         "https://sellercentral.amazon.fr/*",
+        "https://chlabs-brother-label-api-ajz3qng24a-od.a.run.app/*",
         "https://amazon-chronopost-direct-api-ajz3qng24a-od.a.run.app/*"
       ]
     }
@@ -32,7 +34,10 @@
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://amazon-chronopost-direct-api-ajz3qng24a-od.a.run.app/shopify/brother-print*"],
+      "matches": [
+        "https://chlabs-brother-label-api-ajz3qng24a-od.a.run.app/shopify/brother-print*",
+        "https://amazon-chronopost-direct-api-ajz3qng24a-od.a.run.app/shopify/brother-print*"
+      ],
       "js": ["printer-selector.js", "shopify-handoff.js"],
       "run_at": "document_idle"
     }
