@@ -26,6 +26,7 @@
   function cleanLine(value) {
     return String(value || "")
       .replace(/\u00a0/g, " ")
+      .replace(/&#160;/gi, " ")
       .replace(/[\t ]+/g, " ")
       .trim();
   }
@@ -41,13 +42,27 @@
     return candidates.some((candidate) => value === candidate || value.startsWith(`${candidate}:`));
   }
 
-  function extractOrderId(text) {
-    const match = String(text || "").match(/(?:Order ID|N(?:uméro|o) de commande)\s*:\s*#?\s*([0-9]{3}-[0-9]{7}-[0-9]{7})/i);
-    return match ? match[1] : "";
+  function extractOrderId(text, url) {
+    const source = String(text || "").replace(/&#160;/gi, " ");
+    const match = source.match(/(?:Order\s*(?:ID|number)|N(?:uméro|o) de(?: la)? commande)\s*(?:Facturation par Amazon)?\s*:?\s*#?\s*([0-9]{3}-[0-9]{7}-[0-9]{7})/i);
+    if (match) return match[1];
+    try {
+      const parsedUrl = new URL(String(url || ""));
+      for (const key of ["orderId", "orderID", "amazonOrderId", "amazon-order-id"]) {
+        const queryMatch = String(parsedUrl.searchParams.get(key) || "").match(/\b([0-9]{3}-[0-9]{7}-[0-9]{7})\b/);
+        if (queryMatch) return queryMatch[1];
+      }
+      const pathMatch = decodeURIComponent(parsedUrl.pathname).match(/\b([0-9]{3}-[0-9]{7}-[0-9]{7})\b/);
+      if (pathMatch) return pathMatch[1];
+    } catch {
+      const urlMatch = String(url || "").match(/\b([0-9]{3}-[0-9]{7}-[0-9]{7})\b/);
+      if (urlMatch) return urlMatch[1];
+    }
+    return "";
   }
 
   function extractSellerOrderId(text) {
-    const match = String(text || "").match(/(?:Your Seller Order ID|Votre numéro de commande vendeur)\s*:\s*#?\s*([^\s]+)/i);
+    const match = String(text || "").match(/(?:Your Seller Order ID|Votre (?:numéro|ID) de commande vendeur)\s*:\s*#?\s*([^\s]+)/i);
     return match ? cleanLine(match[1]) : "";
   }
 
@@ -108,8 +123,11 @@
     const orderHeading = lines.findIndex((line) => /order details|détails de la commande/i.test(line));
     const headerLines = lines.slice(0, orderHeading >= 0 ? orderHeading : 12);
     const marketplaces = new Set([
-      "france", "united kingdom", "spain", "italy", "germany", "netherlands",
-      "belgium", "sweden", "poland", "ireland"
+      "france", "united kingdom", "royaume-uni", "spain", "espagne", "españa",
+      "italy", "italie", "italia", "germany", "allemagne", "deutschland",
+      "netherlands", "pays-bas", "nederland", "belgium", "belgique", "belgië",
+      "sweden", "suède", "sverige", "poland", "pologne", "polska", "ireland",
+      "irlande", "éire"
     ]);
     const marketplaceIndex = headerLines.findIndex((line) => marketplaces.has(line.toLocaleLowerCase()));
     if (marketplaceIndex > 0) {
@@ -119,7 +137,9 @@
 
     const ignored = new Set([
       "france", "united kingdom", "spain", "italy", "germany", "en", "fr", "help",
-      "new seller central", "seller central", "menu", "products", "workspace"
+      "new seller central", "seller central", "menu", "products", "produits",
+      "productos", "produkte", "prodotti", "workspace", "espace de travail",
+      "arbeitsbereich", "area di lavoro", "mon entreprise", "my business"
     ]);
     return headerLines.find((line) => {
       const lower = line.toLocaleLowerCase();
@@ -209,6 +229,8 @@
   }
 
   function extractPhone(text) {
+    const inline = String(text || "").replace(/&#160;/gi, " ").match(/(?:téléphone|telephone|phone)\s*[:：]\s*([+()\d][\d ()\-.]{7,})/i);
+    if (inline && looksLikePhone(inline[1])) return cleanLine(inline[1]);
     const lines = normalizedLines(text);
     for (let index = 0; index < lines.length; index += 1) {
       const labelled = lines[index].match(/^(?:téléphone|telephone|phone)\s*:\s*(.*)$/i);
@@ -243,7 +265,9 @@
       return !/^[-—]+$/.test(line) &&
         lower !== "modifier" &&
         lower !== "edit" &&
-        !lower.startsWith("instructions de livraison");
+        !lower.startsWith("instructions de livraison") &&
+        !/^(?:client amazon business|invoice by amazon|facturation par amazon)$/i.test(line) &&
+        !/(?:bon de commande|purchase order)\s*[:#]?/i.test(line);
     });
 
     let phone = "";
@@ -273,7 +297,7 @@
     return `${values.day}/${values.month}/${values.year}`;
   }
 
-  function parse(text, now) {
+  function parse(text, now, url) {
     const shipTo = extractShipTo(text);
     const accountName = extractAccountName(text);
     const productName = extractProductName(text);
@@ -281,7 +305,7 @@
     const quantity = extractProductQuantity(text);
     const normalizedProduct = productLabelWithQuantity(productName, quantity);
     return {
-      orderId: extractOrderId(text),
+      orderId: extractOrderId(text, url),
       sellerOrderId: extractSellerOrderId(text),
       accountName,
       accountLabel: normalizedAccount,

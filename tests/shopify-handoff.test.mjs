@@ -8,7 +8,7 @@ const manifest = JSON.parse(await readFile(new URL("../manifest.json", import.me
 test("Shopify handoff prefers the standalone label service and keeps the migration route temporarily", () => {
   const handoff = manifest.content_scripts.find(entry => entry.js.includes("shopify-handoff.js"));
   assert.deepEqual(handoff.matches, [
-    "https://chlabs-brother-label-api-ajz3qng24a-od.a.run.app/shopify/brother-print*",
+    "https://chlabs-brother-label-api-1068150044836.europe-west9.run.app/shopify/brother-print*",
     "https://amazon-chronopost-direct-api-ajz3qng24a-od.a.run.app/shopify/brother-print*"
   ]);
   assert.match(source, /\^\[A-Za-z0-9_-\]\{43\}\$/);

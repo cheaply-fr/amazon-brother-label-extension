@@ -52,6 +52,13 @@
     };
   }
 
+  function parseCurrentPage() {
+    if (/^seller\.octopia\.com$/i.test(location.hostname)) {
+      return globalThis.CheaplyOctopiaParser.parse(document.body.innerText);
+    }
+    return globalThis.CheaplyLabelParser.parse(document.body.innerText, undefined, location.href);
+  }
+
   async function brotherPrinter(settings, printerName = settings.printerName) {
     const { default: BrotherSDK } = await loadBrotherSdk();
     return new BrotherSDK({
@@ -92,7 +99,7 @@
     const { printer } = await resolveBrotherPrinter(settings);
     return printer.print(templateData(job), {
       copies: 1,
-      printName: job.orderId ? `Amazon ${job.orderId}` : "Amazon package label",
+      printName: job.orderId ? `${job.platform || "Marketplace"} ${job.orderId}` : "Marketplace package label",
       fitPage: false,
       autoCut: true,
       quality: true,
@@ -121,7 +128,7 @@
   }
 
   function isOrderPage() {
-    return /^\/orders-v3\/order\/[^/?#]+\/?$/.test(location.pathname);
+    return globalThis.CheaplyLabelRoute.isOrderDetailsPage(location.href);
   }
 
   function syncButton() {
@@ -135,7 +142,7 @@
 
   async function openDialog() {
     document.getElementById(BACKDROP_ID)?.remove();
-    const parsed = globalThis.CheaplyLabelParser.parse(document.body.innerText);
+    const parsed = parseCurrentPage();
     const settings = await chrome.runtime.sendMessage({ type: "GET_SETTINGS" });
     const fallbackChannel = String(settings.channel || "").split(/\r?\n/);
     const automaticAccount = parsed.accountLabel || fallbackChannel[0] || "";
@@ -149,8 +156,8 @@
     backdrop.innerHTML = `
       <form id="cheaply-label-dialog">
         <h2>Package label</h2>
-        <p class="cl-subtitle">Review the Amazon data before printing one 62 mm Automatic Length label.</p>
-        ${missingAddress ? '<p class="cl-warning">Amazon appears to show only a partial delivery address for this order. Complete it before printing.</p>' : ""}
+        <p class="cl-subtitle">Review the ${escapeHtml(parsed.marketplace || parsed.platform || "marketplace")} data before printing one 62 mm Automatic Length label.</p>
+        ${missingAddress ? '<p class="cl-warning">The marketplace appears to show only a partial delivery address for this order. Complete it before printing.</p>' : ""}
         <label for="cl-address">Destination</label>
         <textarea id="cl-address" required>${escapeHtml(parsed.address)}</textarea>
         <div class="cl-grid">
@@ -159,16 +166,16 @@
             <input id="cl-phone" value="${escapeHtml(parsed.phone)}" placeholder="Optional">
           </div>
           <div>
-            <label for="cl-date">Amazon order date</label>
+            <label for="cl-date">Order date</label>
             <input id="cl-date" value="${escapeHtml(parsed.date)}" required>
           </div>
         </div>
-        <label for="cl-account-label">Amazon account</label>
+        <label for="cl-account-label">Sales account</label>
         <input id="cl-account-label" value="${escapeHtml(automaticAccount)}" title="${escapeHtml(parsed.accountName)}">
         <label for="cl-product-label">Object shortcut</label>
         <input id="cl-product-label" value="${escapeHtml(automaticProduct)}" title="${escapeHtml(parsed.productName)}">
         <label for="cl-order">Order ID</label>
-        <input id="cl-order" value="${escapeHtml(parsed.orderId)}" readonly>
+        <input id="cl-order" value="${escapeHtml(parsed.orderId)}" maxlength="64" placeholder="Marketplace order number">
         <label for="cl-qr">QR sender details</label>
         <input id="cl-qr" value="${escapeHtml(settings.qrText || "")}" placeholder="Leave empty to omit the QR code">
         <div class="cl-actions">
@@ -199,8 +206,9 @@
           backdrop.querySelector("#cl-product-label").value.trim()
         ].filter(Boolean).join("\n"),
         qrText: backdrop.querySelector("#cl-qr").value.trim(),
-        orderId: parsed.orderId,
-        sellerOrderId: parsed.sellerOrderId
+        orderId: backdrop.querySelector("#cl-order").value.trim(),
+        sellerOrderId: parsed.sellerOrderId,
+        platform: parsed.platform || "Amazon"
       };
     }
 

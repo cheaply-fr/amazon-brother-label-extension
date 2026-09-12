@@ -1,6 +1,6 @@
 # Security and privacy
 
-- The extension is limited to `sellercentral.amazon.fr` and requests only Chrome `storage` permission.
+- The extension is limited to official Amazon Seller Central domains and requests only Chrome `storage` permission.
 - It does not use a backend, analytics, telemetry, or remote executable code.
 - Buyer and recipient data is read from the visible signed-in order page and sent only to the locally installed Brother b-PAC component for the user-requested print.
 - Sender QR text is optional, has no repository default, and is stored only in the browser profile.

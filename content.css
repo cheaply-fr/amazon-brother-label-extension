@@ -64,6 +64,13 @@
 #cheaply-label-cancel { background: #fff; border: 1px solid #888c8c; }
 #cheaply-label-print { background: #ffd814; border: 1px solid #fcd200; }
 
+@media print {
+  #cheaply-label-button,
+  #cheaply-label-backdrop {
+    display: none !important;
+  }
+}
+
 @media (max-width: 560px) {
   #cheaply-label-dialog .cl-grid { grid-template-columns: 1fr; }
 }

@@ -54,7 +54,7 @@ Permission justification:
 
 - `storage`: saves optional sender QR text and local label preferences in the
   browser profile.
-- `https://sellercentral.amazon.fr/orders-v3/order/*`: reads the visible order
+- Official Amazon Seller Central `/orders-v3/order/*` URLs worldwide: read the visible order
   details required to populate the label on the user-selected order page.
 - The exact Chlabs `/shopify/brother-print` route consumes a random, two-minute,
   single-use print handoff created by the authenticated Shopify app.

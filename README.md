@@ -1,4 +1,4 @@
-# Amazon Brother Package Label BETA
+# Marketplace Brother Package Label BETA
 
 > THIS EXTENSION IS FOR BETA TESTING.
 
@@ -12,7 +12,7 @@ Required local components:
 
 The label dialog includes **Check printer setup**, which renders the populated template without sending a physical print. **Print one label** sends exactly one copy with automatic cutting.
 
-An internal Chrome extension that reads the visible delivery information from an Amazon Seller Central order or consumes an authenticated Shopify print handoff, then reproduces the existing 62 mm P-touch label through Brother b-PAC.
+An internal Chrome extension that reads the visible delivery information from Amazon Seller Central and Octopia/Cdiscount orders, or consumes an authenticated Shopify print handoff, then reproduces the existing 62 mm P-touch label through Brother b-PAC.
 
 ## Install
 
@@ -24,7 +24,7 @@ The Windows setup package installs the template at:
 
 `C:\Users\Public\Documents\Chlabs\AmazonBrotherPackageLabel\address-62mm-bottom-code128.lbx`
 
-After installation, open an Amazon.fr Seller Central order page, refresh it
+After installation, open an Amazon Seller Central or Octopia order-detail page, refresh it
 once, and click **Print package label** near the order heading.
 
 The extension requests access only to Amazon.fr order-detail pages and the exact Chlabs Shopify print-handoff route. Shopify customer data is encrypted by the backend, available for two minutes and consumed exactly once; the browser extension does not retain it. The profile-local sender QR value never leaves the computer.
