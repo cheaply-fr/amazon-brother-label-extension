@@ -62,3 +62,11 @@ test("does not leak billing details into the delivery address", () => {
   const result = parser.parse(`${orderText}\nNom, Prénom\nBilling Person\nAdresse\n99 Billing Road`);
   assert.doesNotMatch(result.address, /Billing/);
 });
+
+test("falls back to a plausible phone value when Octopia changes or omits the label", () => {
+  const changedLabel = orderText.replace("N° de tel. portable", "Téléphone mobile du destinataire");
+  const result = parser.parse(changedLabel);
+  assert.equal(result.phone, "0612345678");
+  assert.equal(parser.looksLikePhoneValue("34370"), false);
+  assert.equal(parser.looksLikePhoneValue("+33 6 12 34 56 78"), true);
+});

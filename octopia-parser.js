@@ -15,6 +15,12 @@
     return lines.slice(index + 1, Math.min(end, index + 5)).find(Boolean) || "";
   }
 
+  function looksLikePhoneValue(value) {
+    const text = cleanLine(value);
+    const digits = text.replace(/\D/g, "");
+    return digits.length >= 8 && digits.length <= 15 && /^\+?[\d ().-]+$/.test(text);
+  }
+
   function extractOrderId(text) {
     const match = String(text || "").match(/N(?:°|o)\s*de commande\s*:?\s*([A-Z0-9-]{6,64})/i);
     return match ? cleanLine(match[1]) : "";
@@ -46,7 +52,10 @@
     const postalCode = nextValue(lines, /^Code postal$/i, deliveryStart, end);
     const city = nextValue(lines, /^Ville$/i, deliveryStart, end);
     const country = nextValue(lines, /^Pays$/i, deliveryStart, end);
-    const phone = nextValue(lines, /^N(?:°|o) de (?:tél\.?|tel\.?) portable$/i, deliveryStart, end);
+    const labelledPhone = nextValue(lines, /^N(?:°|o) de (?:tél\.?|tel\.?) portable$/i, deliveryStart, end);
+    const phone = looksLikePhoneValue(labelledPhone)
+      ? labelledPhone
+      : lines.slice(deliveryStart + 1, end).find(looksLikePhoneValue) || "";
     return {
       address: [name, street, [postalCode, city].filter(Boolean).join(" "), country].filter(Boolean).join("\n"),
       phone
@@ -104,5 +113,5 @@
     };
   }
 
-  scope.CheaplyOctopiaParser = Object.freeze({ parse, extractOrderId, extractOrderDate, extractAccountName, extractCustomer, extractProduct });
+  scope.CheaplyOctopiaParser = Object.freeze({ parse, extractOrderId, extractOrderDate, extractAccountName, extractCustomer, extractProduct, looksLikePhoneValue });
 })(globalThis);
