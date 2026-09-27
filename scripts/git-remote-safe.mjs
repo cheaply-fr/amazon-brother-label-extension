@@ -8,6 +8,7 @@ import { pathToFileURL } from "node:url";
 
 const MAX_CAPTURE_BYTES = 1024 * 1024;
 const DEFAULT_TIMEOUT_MS = 120_000;
+export const CANONICAL_GITHUB_OWNER = "cheaply-fr";
 const BLACKHOLE_PROXY = /^https?:\/\/(?:127\.0\.0\.1|localhost|\[::1\]):9\/?$/i;
 const PROXY_KEYS = ["HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "GIT_HTTP_PROXY", "GIT_HTTPS_PROXY"];
 
@@ -53,6 +54,9 @@ export function parseGitHubRemote(value) {
   const match = url.pathname.match(/^\/([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+?)(?:\.git)?\/?$/);
   if (!match || match[1] === "." || match[1] === ".." || match[2] === "." || match[2] === "..") {
     throw new Error("The GitHub remote must contain exactly one owner and repository name.");
+  }
+  if (match[1].toLowerCase() !== CANONICAL_GITHUB_OWNER) {
+    throw new Error(`The GitHub remote must belong to the canonical ${CANONICAL_GITHUB_OWNER} organization.`);
   }
   return { url: `https://github.com/${match[1]}/${match[2]}.git`, owner: match[1], repository: match[2] };
 }

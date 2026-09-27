@@ -121,7 +121,7 @@ node scripts/git-remote-safe.mjs pull --branch main
 node scripts/git-remote-safe.mjs push --refspec HEAD:refs/heads/main
 ```
 
-The wrapper accepts only credential-free `https://github.com/<owner>/<repo>` remotes, rejects unsafe refs, bypasses persistent credential helpers, uses an ephemeral GitHub CLI token through a temporary askpass file, forces OpenSSL for only the child Git process, disables interactive prompts, removes only the known Codex loopback blackhole proxy, enforces a timeout, and cleans up in `finally`. Tokens are never placed in Git arguments, repository configuration, or source files. Read-only operations may retry twice; push and pull never retry automatically because their outcome can be ambiguous. See [docs/SAFE_GIT_PUBLISHING.md](docs/SAFE_GIT_PUBLISHING.md) for the failure matrix and incident procedure.
+The wrapper accepts only credential-free `https://github.com/cheaply-fr/<repo>` remotes, rejects unsafe refs, bypasses persistent credential helpers, uses an ephemeral GitHub CLI token through a temporary askpass file, forces OpenSSL for only the child Git process, disables interactive prompts, removes only the known Codex loopback blackhole proxy, enforces a timeout, and cleans up in `finally`. Tokens are never placed in Git arguments, repository configuration, or source files. Read-only operations may retry twice; push and pull never retry automatically because their outcome can be ambiguous. See [docs/SAFE_GIT_PUBLISHING.md](docs/SAFE_GIT_PUBLISHING.md) for the failure matrix and incident procedure.
 
 ## Notes
 
