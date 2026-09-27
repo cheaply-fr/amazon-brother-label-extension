@@ -8,8 +8,8 @@ Publisher: `cheaply.fr` (`834b08cc-f204-46e3-b7d0-d914b36c2504`)
 
 - Category: Workflow & Planning
 - Language: English
-- Homepage: `https://github.com/faresd/amazon-brother-label-extension`
-- Support: `https://github.com/faresd/amazon-brother-label-extension/issues`
+- Homepage: `https://github.com/cheaply-fr/amazon-brother-label-extension`
+- Support: `https://github.com/cheaply-fr/amazon-brother-label-extension/issues`
 
 Description:
 

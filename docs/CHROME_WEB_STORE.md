@@ -34,7 +34,7 @@ item ID, set `CWS_EXTENSION_ID` and enable uploads.
 If `google-github-actions/auth` reports `unauthorized_client` because the
 credential is rejected by the provider's attribute condition, update the
 Google Cloud Workload Identity provider condition to allow this repository:
-`assertion.repository == 'faresd/amazon-brother-label-extension'` (or combine
+`assertion.repository == 'cheaply-fr/amazon-brother-label-extension'` (or combine
 it with the existing release-branch restriction). The account making that
 change needs permission to read and update Workload Identity pool providers;
 the GitHub deployment service account intentionally does not have that
@@ -46,6 +46,21 @@ through the bridge repository's approved Workload Identity trust. Its
 this repository and publishes item `cjcpkepjaohailehapclenmiplfbckbp`. The
 extension repository's direct uploader remains disabled until its own
 repository claim is accepted by the Google provider.
+
+## Canonical repository ownership
+
+The canonical repository is
+`https://github.com/cheaply-fr/amazon-brother-label-extension`. Keep the
+`production` environment, repository variables, branch protections, CODEOWNERS,
+release links, and Workload Identity repository condition attached to
+`cheaply-fr/amazon-brother-label-extension`; do not recreate them under the
+legacy `faresd` organization. The safe Git wrapper also rejects remotes outside
+the `cheaply-fr` organization.
+
+No Cloudflare integration is referenced by this extension repository. If a
+future deployment adds one, authorize it against the `cheaply-fr` repository
+and keep its tokens in the existing protected environment without rotating
+production secrets.
 
 ## Release
 

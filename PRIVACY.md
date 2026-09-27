@@ -58,4 +58,4 @@ to the user's printer.
 ## Contact
 
 Questions or requests can be filed at
-<https://github.com/faresd/amazon-brother-label-extension/issues>.
+<https://github.com/cheaply-fr/amazon-brother-label-extension/issues>.

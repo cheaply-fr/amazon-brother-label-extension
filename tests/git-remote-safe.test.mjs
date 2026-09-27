@@ -26,21 +26,25 @@ test("detects Codex on Windows even when USERNAME reflects the desktop user", ()
   assert.equal(isCodexWindowsSandbox({ USERNAME: "frees", USERDOMAIN: "FDR", CODEX_SHELL: "1" }), process.platform === "win32");
 });
 
-test("accepts and normalizes the expected GitHub HTTPS remote", () => {
-  assert.deepEqual(parseGitHubRemote("https://github.com/faresd/example.git"), {
-    url: "https://github.com/faresd/example.git", owner: "faresd", repository: "example"
+test("accepts and normalizes the canonical GitHub HTTPS remote", () => {
+  assert.deepEqual(parseGitHubRemote("https://github.com/cheaply-fr/example.git"), {
+    url: "https://github.com/cheaply-fr/example.git", owner: "cheaply-fr", repository: "example"
   });
 });
 
+test("rejects the legacy GitHub organization", () => {
+  assert.throws(() => parseGitHubRemote("https://github.com/faresd/example.git"), /canonical cheaply-fr organization/);
+});
+
 for (const remote of [
-  "http://github.com/faresd/example.git",
-  "https://github.example/faresd/example.git",
-  "https://github.com.evil.test/faresd/example.git",
-  "https://token@github.com/faresd/example.git",
-  "https://github.com/faresd/example/extra.git",
-  "https://github.com/faresd%2Fexample.git",
-  "https://github.com/faresd/example.git?token=secret",
-  "git@github.com:faresd/example.git"
+  "http://github.com/cheaply-fr/example.git",
+  "https://github.example/cheaply-fr/example.git",
+  "https://github.com.evil.test/cheaply-fr/example.git",
+  "https://token@github.com/cheaply-fr/example.git",
+  "https://github.com/cheaply-fr/example/extra.git",
+  "https://github.com/cheaply-fr%2Fexample.git",
+  "https://github.com/cheaply-fr/example.git?token=secret",
+  "git@github.com:cheaply-fr/example.git"
 ]) test(`rejects unsafe remote ${remote}`, () => assert.throws(() => parseGitHubRemote(remote)));
 
 test("removes only Codex blackhole proxies and disables prompts", () => {
@@ -138,7 +142,7 @@ test("network-free diagnosis succeeds inside the repository", () => {
   assert.equal(result.status, 0, result.stderr);
   const diagnosis = JSON.parse(result.stdout);
   assert.equal(diagnosis.safe, true);
-  assert.equal(diagnosis.repository, "faresd/amazon-brother-label-extension");
+  assert.equal(diagnosis.repository, "cheaply-fr/amazon-brother-label-extension");
   assert.equal(diagnosis.interactivePrompts, false);
   assert.equal(diagnosis.tlsBackend, "openssl");
 });
