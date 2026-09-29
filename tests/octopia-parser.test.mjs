@@ -70,3 +70,15 @@ test("falls back to a plausible phone value when Octopia changes or omits the la
   assert.equal(parser.looksLikePhoneValue("34370"), false);
   assert.equal(parser.looksLikePhoneValue("+33 6 12 34 56 78"), true);
 });
+
+test("captures the Cdiscount delivery mobile number from the current customer layout", () => {
+  const currentLayout = orderText
+    .replace("Mme EXEMPLE Alice", "M. TADLAOUI CHAGDALLOUZ Zakaria")
+    .replace("2 rue de Test", "14 Avenue De L Europe")
+    .replace("34370", "95400")
+    .replace("EXEMPLEVILLE", "Villiers Le Bel")
+    .replace("0612345678", "0621320737");
+  const result = parser.parse(currentLayout);
+  assert.equal(result.phone, "0621320737");
+  assert.match(result.address, /M\. TADLAOUI CHAGDALLOUZ Zakaria\n14 Avenue De L Europe\n95400 Villiers Le Bel\nFR/);
+});
