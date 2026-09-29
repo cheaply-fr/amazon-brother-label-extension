@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Marketplace Brother Package Label BETA",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "THIS EXTENSION IS FOR BETA TESTING. Prints 62 mm Amazon, Octopia and Cdiscount package labels through Brother b-PAC.",
   "permissions": ["storage"],
   "host_permissions": [

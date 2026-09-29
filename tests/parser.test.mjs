@@ -113,6 +113,19 @@ Quantité
   assert.match(result.address, /OMEGA INGENIERIE/);
 });
 
+test("accepts a labeled international phone without a plus sign", () => {
+  const result = parser.parse(`
+Ship to
+Recipient
+1 Rue Example
+75001 Paris
+Contact Buyer:	CartIn
+Phone:	33174224375
+Order contents
+`);
+  assert.equal(result.phone, "33174224375");
+});
+
 test("falls back to the order URL when Amazon renders the order number separately", () => {
   const result = parser.parse("Détails de la commande\nNuméro de la commande\n402-1704332-3287560", undefined, "https://sellercentral-europe.amazon.com/orders-v3/order/402-1704332-3287560");
   assert.equal(result.orderId, "402-1704332-3287560");

@@ -228,19 +228,25 @@
     return digits.length >= 8 && /(?:\+|\b0)[\d ()\-.]{7,}/.test(String(line || ""));
   }
 
+  function looksLikeLabeledPhone(line) {
+    const value = String(line || "").trim();
+    const digits = value.replace(/\D/g, "");
+    return digits.length >= 8 && digits.length <= 15 && /^[+\d][\d ()\-.]*$/.test(value);
+  }
+
   function extractPhone(text) {
     const inline = String(text || "").replace(/&#160;/gi, " ").match(/(?:téléphone|telephone|phone)\s*[:：]\s*([+()\d][\d ()\-.]{7,})/i);
-    if (inline && looksLikePhone(inline[1])) return cleanLine(inline[1]);
+    if (inline && looksLikeLabeledPhone(inline[1])) return cleanLine(inline[1]);
     const lines = normalizedLines(text);
     for (let index = 0; index < lines.length; index += 1) {
       const labelled = lines[index].match(/^(?:téléphone|telephone|phone)\s*:\s*(.*)$/i);
       if (!labelled) continue;
 
       const inlineValue = cleanLine(labelled[1]);
-      if (inlineValue && looksLikePhone(inlineValue)) return inlineValue;
+      if (inlineValue && looksLikeLabeledPhone(inlineValue)) return inlineValue;
 
       for (let next = index + 1; next < Math.min(lines.length, index + 3); next += 1) {
-        if (looksLikePhone(lines[next])) return cleanLine(lines[next]);
+        if (looksLikeLabeledPhone(lines[next])) return cleanLine(lines[next]);
       }
     }
     return "";
@@ -275,7 +281,7 @@
     useful.forEach((line) => {
       const labelled = line.match(/^(?:téléphone|telephone|phone)\s*:\s*(.+)$/i);
       if (!phone && labelled) {
-        phone = cleanLine(labelled[1]);
+        if (looksLikeLabeledPhone(labelled[1])) phone = cleanLine(labelled[1]);
       } else if (!phone && looksLikePhone(line)) {
         phone = line;
       } else {
