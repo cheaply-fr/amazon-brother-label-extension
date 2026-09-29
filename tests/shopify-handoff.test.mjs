@@ -20,7 +20,7 @@ test("Shopify handoff prefers the standalone label service and keeps the migrati
 test("Shopify jobs populate every required P-touch object", () => {
   for (const objectName of ["Texte6", "Texte10", "Code à barres1", "Code à barres10", "Date et heure8"])
     assert.ok(source.includes(`"${objectName}"`), `missing mapping for ${objectName}`);
-  assert.match(source, /\[job\.destination, job\.phone\]\.filter\(Boolean\)\.join\("\\n"\)/);
+  assert.match(source, /\[job\.destination, job\.phone \? `Tél\. \$\{job\.phone\}` : ""\]\.filter\(Boolean\)\.join\("\\n"\)/);
   assert.match(source, /settings\.qrText/);
   assert.match(source, /job\.orderId/);
   assert.match(source, /parseDate\(job\.date\)/);

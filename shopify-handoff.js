@@ -51,7 +51,7 @@
 
   function templateData(job, settings) {
     return {
-      "Texte6": [job.destination, job.phone].filter(Boolean).join("\n"),
+      "Texte6": [job.destination, job.phone ? `Tél. ${job.phone}` : ""].filter(Boolean).join("\n"),
       "Texte10": String(job.channel || "").replace(/\r\n?/g, "\n"),
       "Code à barres1": settings.qrText || "",
       "Code à barres10": job.orderId || "",
