@@ -50,13 +50,8 @@
   }
 
   function templateData(job, settings) {
-    const destination = String(job.destination || "").trim();
-    const phone = String(job.phone || "").trim();
-    const destinationWithPhone = phone
-      ? (destination ? destination.replace(/\r?\n([^\r\n]*)$/, `$1 · Tél. ${phone}`) : `Tél. ${phone}`)
-      : destination;
     return {
-      "Texte6": destinationWithPhone,
+      "Texte6": globalThis.CheaplyLabelData.destinationWithPhone(job.destination, job.phone),
       "Texte10": String(job.channel || "").replace(/\r\n?/g, "\n"),
       "Code à barres1": settings.qrText || "",
       "Code à barres10": job.orderId || "",

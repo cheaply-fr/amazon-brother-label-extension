@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Marketplace Brother Package Label BETA",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "description": "THIS EXTENSION IS FOR BETA TESTING. Prints 62 mm Amazon, Octopia and Cdiscount package labels through Brother b-PAC.",
   "permissions": ["storage"],
   "host_permissions": [
@@ -103,7 +103,7 @@
         "https://sellercentral.amazon.co.jp/*",
         "https://seller.octopia.com/Order/Detail/*"
       ],
-      "js": ["parser.js", "octopia-parser.js", "printer-selector.js", "route-guard.js", "content.js"],
+      "js": ["parser.js", "octopia-parser.js", "printer-selector.js", "route-guard.js", "label-data.js", "content.js"],
       "css": ["content.css"],
       "run_at": "document_idle"
     },
@@ -112,7 +112,7 @@
         "https://chlabs-brother-label-api-1068150044836.europe-west9.run.app/shopify/brother-print*",
         "https://amazon-chronopost-direct-api-ajz3qng24a-od.a.run.app/shopify/brother-print*"
       ],
-      "js": ["printer-selector.js", "shopify-handoff.js"],
+        "js": ["printer-selector.js", "label-data.js", "shopify-handoff.js"],
       "run_at": "document_idle"
     }
   ]

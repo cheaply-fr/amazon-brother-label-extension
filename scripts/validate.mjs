@@ -50,14 +50,14 @@ assert.ok(amazonContentScript.matches.includes("https://seller.octopia.com/Order
 assert.ok(bpacResource.matches.includes("https://seller.octopia.com/*"));
 
 const required = [
-  "manifest.json", "service-worker.js", "content.js", "content.css", "parser.js", "octopia-parser.js", "printer-selector.js", "route-guard.js", "shopify-handoff.js",
+  "manifest.json", "service-worker.js", "content.js", "content.css", "parser.js", "octopia-parser.js", "printer-selector.js", "route-guard.js", "label-data.js", "shopify-handoff.js",
   "options.html", "options.js", "options.css", "bpac-sdk.js",
   "template-source/final/label.xml", "template-source/final/prop.xml",
   "template-source/final/Object0.bmp", "BPAC_JS_LICENSE.txt", "THIRD_PARTY_NOTICES.txt"
 ];
 for (const file of required) assert.ok((await stat(new URL(file, root))).isFile(), `missing ${file}`);
 
-const sourceFiles = ["manifest.json", "service-worker.js", "options.js", "content.js", "parser.js", "octopia-parser.js", "printer-selector.js", "route-guard.js", "shopify-handoff.js", "README.md"];
+const sourceFiles = ["manifest.json", "service-worker.js", "options.js", "content.js", "parser.js", "octopia-parser.js", "printer-selector.js", "route-guard.js", "label-data.js", "shopify-handoff.js", "README.md"];
 const source = (await Promise.all(sourceFiles.map((file) => readFile(new URL(file, root), "utf8")))).join("\n");
 assert.ok(!source.includes("C:\\\\Users\\\\frees") && !source.includes("C:\\Users\\frees"), "release source contains a user-specific Windows path");
 assert.ok(!/4 rue de broglie|33662775987/i.test(source), "release source contains private sender details");
