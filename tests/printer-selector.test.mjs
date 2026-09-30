@@ -30,3 +30,31 @@ test("rejects a different Brother model", async () => {
     /No installed QL-700 printer/
   );
 });
+
+test("deduplicates replacement names and prefers the exact configured printer", () => {
+  assert.deepEqual(
+    Array.from(selector.sameModelPrinters(["Brother QL-700 (Copy 1)", "Brother QL-700", "Brother QL-700", "Brother QL-800"], "Brother QL-700")),
+    ["Brother QL-700", "Brother QL-700 (Copy 1)"]
+  );
+});
+
+test("rejects an unparseable configured printer model", () => {
+  assert.throws(() => selector.sameModelPrinters(["Brother QL-700"], "Brother Printer"), /Cannot determine the Brother model/);
+});
+
+test("continues after unsupported and error-status printers", async () => {
+  const seen = [];
+  const result = await selector.selectPrinter(
+    ["Brother QL-700", "Brother QL-700 (Copy 2)", "Brother QL-700 (Copy 3)"],
+    "Brother QL-700",
+    async (name) => {
+      seen.push(name);
+      if (name === "Brother QL-700") return { online: false, supported: true, errorCode: 0 };
+      if (name.endsWith("Copy 2)")) return { online: true, supported: false };
+      if (name.endsWith("Copy 3)")) return { online: true, supported: true, errorCode: 0 };
+      return { online: true, supported: true, errorCode: 0 };
+    }
+  );
+  assert.equal(result.printerName, "Brother QL-700 (Copy 3)");
+  assert.deepEqual(seen, ["Brother QL-700", "Brother QL-700 (Copy 2)", "Brother QL-700 (Copy 3)"]);
+});
