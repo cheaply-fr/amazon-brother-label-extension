@@ -3,7 +3,7 @@ import test from "node:test";
 import vm from "node:vm";
 import { readFile } from "node:fs/promises";
 
-const context = { globalThis: {} };
+const context = { globalThis: {}, setTimeout, clearTimeout };
 vm.runInNewContext(await readFile(new URL("../label-data.js", import.meta.url), "utf8"), context);
 const data = context.globalThis.CheaplyLabelData;
 
@@ -30,4 +30,20 @@ test("does not duplicate a phone already present in the address", () => {
 
 test("keeps long international numbers intact", () => {
   assert.match(data.destinationWithPhone("Name\nFR", "+33 6 21 32 07 37"), /\+33 6 21 32 07 37$/);
+});
+
+test("withTimeout resolves a successful operation", async () => {
+  await assert.doesNotReject(data.withTimeout(Promise.resolve("ok"), 50, "timed out"));
+});
+
+test("withTimeout rejects a hung operation with an actionable error", async () => {
+  await assert.rejects(
+    data.withTimeout(new Promise(() => {}), 5, "Brother print timed out"),
+    /Brother print timed out/
+  );
+});
+
+test("withTimeout rejects invalid timeout values safely", async () => {
+  assert.equal(await data.withTimeout(Promise.resolve("ok"), 0, "unused"), "ok");
+  assert.equal(await data.withTimeout(Promise.resolve("ok"), Number.NaN, "unused"), "ok");
 });
