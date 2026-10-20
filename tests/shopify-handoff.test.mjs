@@ -34,6 +34,9 @@ test("Shopify printing enforces replacement-model selection and production quali
   assert.match(source, /quality: true/);
   assert.match(source, /highResolution: true/);
   assert.match(source, /highSpeed: false/);
+  assert.match(source, /withTimeout/);
+  assert.match(source, /withTimeout\(\(async \(\) => \{\s*const \{ instance, printerStatus \} = await resolvePrinter\(settings\)/);
+  assert.match(source, /within 30 seconds\. Print result is unknown/);
 });
 
 test("printer check renders without printing and print mode sends exactly one copy", () => {

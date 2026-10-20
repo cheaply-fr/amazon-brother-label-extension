@@ -140,3 +140,10 @@ test("manual order number corrections are editable and used for printing", () =>
   assert.doesNotMatch(contentSource, /id="cl-order"[^>]*\sreadonly/);
   assert.match(contentSource, /orderId:\s*backdrop\.querySelector\("#cl-order"\)\.value\.trim\(\)/);
 });
+
+test("content print path has a bounded Brother operation and retryable timeout", () => {
+  assert.match(contentSource, /withTimeout\(\(async \(\) => \{\s*const \{ printer \} = await resolveBrotherPrinter\(settings\)/);
+  assert.match(contentSource, /Brother did not complete printer setup and the print job within 30 seconds/);
+  assert.match(contentSource, /Retry after checking printer/);
+  assert.match(contentSource, /Print result is unknown; check the printer before retrying/);
+});

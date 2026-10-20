@@ -96,16 +96,18 @@
   }
 
   async function printOneLabel(job, settings) {
-    const { printer } = await resolveBrotherPrinter(settings);
-    return printer.print(templateData(job), {
-      copies: 1,
-      printName: job.orderId ? `${job.platform || "Marketplace"} ${job.orderId}` : "Marketplace package label",
-      fitPage: false,
-      autoCut: true,
-      quality: true,
-      highResolution: true,
-      highSpeed: false
-    });
+    return globalThis.CheaplyLabelData.withTimeout((async () => {
+      const { printer } = await resolveBrotherPrinter(settings);
+      return printer.print(templateData(job), {
+        copies: 1,
+        printName: job.orderId ? `${job.platform || "Marketplace"} ${job.orderId}` : "Marketplace package label",
+        fitPage: false,
+        autoCut: true,
+        quality: true,
+        highResolution: true,
+        highSpeed: false
+      });
+    })(), 30000, "Brother did not complete printer setup and the print job within 30 seconds. Print result is unknown; check the printer before retrying.");
   }
 
   function escapeHtml(value) {
@@ -245,8 +247,12 @@
         setTimeout(() => backdrop.remove(), 1000);
       } catch (error) {
         printButton.disabled = false;
-        printButton.textContent = "Print one label";
-        status.textContent = `Could not print: ${error?.message || error}`;
+        const message = error?.message || String(error);
+        const uncertain = /result is unknown/i.test(message);
+        printButton.textContent = uncertain ? "Retry after checking printer" : "Print one label";
+        status.textContent = uncertain
+          ? message
+          : `Could not print: ${message}`;
       }
     });
   }

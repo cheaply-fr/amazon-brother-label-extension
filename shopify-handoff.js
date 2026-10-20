@@ -90,19 +90,22 @@
     const value = await response.json().catch(() => ({}));
     if (!response.ok || !value.job) throw new Error(value.error || `The print handoff failed (${response.status}).`);
     const settings = await chrome.runtime.sendMessage({ type: "GET_SETTINGS" });
-    const { instance, printerStatus } = await resolvePrinter(settings);
-    if (printerStatus.documentMedia !== "62mm") throw new Error(`Brother did not select the 62 mm continuous document format (selected: ${printerStatus.documentMedia || "unknown"}).`);
-    const data = templateData(value.job, settings);
-    if (value.job.mode === "check") {
-      const image = await instance.getImageData(data);
-      if (!image || image.length < 100) throw new Error("Brother could not render the package-label template.");
-      showPreview(image);
-      status(`Brother setup is ready (${printerStatus.printerName || settings.printerName}, 62 mm continuous). No label was printed.`);
-    } else {
-      await instance.print(data, { copies: 1, printName: `Shopify ${value.job.orderId}`, fitPage: false, autoCut: true, quality: true, highResolution: true, highSpeed: false });
-      status(`One Shopify package label for ${value.job.orderId} was sent successfully.`);
-    }
+    await globalThis.CheaplyLabelData.withTimeout((async () => {
+      const { instance, printerStatus } = await resolvePrinter(settings);
+      if (printerStatus.documentMedia !== "62mm") throw new Error(`Brother did not select the 62 mm continuous document format (selected: ${printerStatus.documentMedia || "unknown"}).`);
+      const data = templateData(value.job, settings);
+      if (value.job.mode === "check") {
+        const image = await instance.getImageData(data);
+        if (!image || image.length < 100) throw new Error("Brother could not render the package-label template.");
+        showPreview(image);
+        status(`Brother setup is ready (${printerStatus.printerName || settings.printerName}, 62 mm continuous). No label was printed.`);
+      } else {
+        await instance.print(data, { copies: 1, printName: `Shopify ${value.job.orderId}`, fitPage: false, autoCut: true, quality: true, highResolution: true, highSpeed: false });
+        status(`One Shopify package label for ${value.job.orderId} was sent successfully.`);
+      }
+    })(), 30000, "Brother did not complete printer setup and the Shopify job within 30 seconds. Print result is unknown; check the printer before retrying.");
   } catch (error) {
-    status(`Could not print: ${error?.message || error}`, true);
+    const message = error?.message || String(error);
+    status(/result is unknown/i.test(message) ? message : `Could not print: ${message}`, true);
   }
 })();
